@@ -1,0 +1,58 @@
+```{r}
+# Load the necessary packages
+library(tidycensus)
+library(dplyr)
+library(tidyverse)
+```
+
+```{r}
+census_api_key("7f9fe0f583b0c04f100196af6c16c58796014a1f", install = TRUE, overwrite = TRUE)
+readRenviron("~/.Renviron")
+```
+
+
+```{r}
+
+# Load variables for a specific year and geography
+# Let's say we want total population (B01003_001) and population under 18 (B01001_003) for all counties in a state
+
+household_children <- get_acs(geography = "state",
+                              variables = c("B09005_001E","B09005_002E", "B09005_003E", "B09005_004E", "B09005_005E"),
+                              year = 2022,
+                              state = "VT",
+                              survey = "acs5",
+                              output = "wide"
+)
+```
+
+```{r}
+#single householder with minor children(male)
+household_children$ratio_male <- household_children$B09005_004E/household_children$B09005_001E
+household_children$per_male <- household_children$ratio_male*100 # this should be ratio_male not ratio_m
+
+#single householder with minor children (female)
+household_children$ratio_female <- household_children$B09005_005E/household_children$B09005_001E
+household_children$per_female <- household_children$ratio_female*100
+
+#two householders with minor children 
+household_children$ratio_two <- (household_children$B09005_002E+household_children$B09005_003E)/household_children$B09005_001E
+household_children$per_two <- household_children$ratio_two*100
+
+#group median percent
+```
+
+
+```{r}
+plotDf <- household_children[,13:ncol(household_children)] |> # we only need column 13 and after
+  pivot_longer(1:6,names_to = 'var', values_to = 'value') |>
+  # remember that when you plot geom_col, you need the three values to be three observations of the same one variable (that means in the same one column), not three different variables (or columns); then, you need another column as the x which tells us what each value stands for (permale, perfemale, pertwo). Same when you plot geom_bar, except you don't need the column for x.
+  filter(var %in% c('per_male', 'per_female', 'per_two')) 
+```
+
+
+```{r}
+library(ggplot2)
+ggplot(plotDf, aes(x = var, y = value)) + 
+  geom_col() +
+  labs(x = 'family type', title = "Family types under poverty level")
+```
