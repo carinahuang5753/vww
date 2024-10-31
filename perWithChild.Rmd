@@ -56,3 +56,67 @@ ggplot(plotDf, aes(x = var, y = value)) +
   geom_col() +
   labs(x = 'family type', title = "Family types under poverty level")
 ```
+
+# Change column color
+
+for each column to have a different color (fill), you'll have to tell ggplot what to change colors by (in our case, by var):
+
+```{r}
+ggplot(plotDf, aes(x = var, y = value, fill = var)) + 
+  geom_col() +
+  labs(x = 'family type', title = "Family types under poverty level")
+```
+
+You can specify what the colors are. One way is to use a preset.
+
+See more presets here: https://r-graph-gallery.com/38-rcolorbrewers-palettes.html
+
+```{r}
+ggplot(plotDf, aes(x = var, y = value, fill = var)) + 
+  geom_col() +
+  labs(x = 'family type', title = "Family types under poverty level") +
+  scale_fill_brewer(palette = 'Spectral')
+```
+
+Or you can manually add colors. Like this:
+
+```{r}
+ggplot(plotDf, aes(x = var, y = value, fill = var)) + 
+  geom_col() +
+  labs(x = 'family type', title = "Family types under poverty level") +
+  scale_fill_manual(values = c('#9e2a2b','#e09f3e','#0a9396'))
+```
+
+## Change background color
+
+there are two ways to do this. The easier one is to pick a pre-set theme from ggthemes. This will change the font and a lot of other things to the pre-set, too.
+
+See all themes here: https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/
+
+```{r}
+#install.packages('ggthemes')
+library(ggthemes)
+ggplot(plotDf, aes(x = var, y = value, fill = var)) + 
+  geom_col() +
+  labs(x = 'family type', title = "Family types under poverty level") +
+  scale_fill_manual(values = c('#9e2a2b','#e09f3e','#0a9396')) +
+  theme_tufte()
+```
+
+Or you can set the background of the panel to be 'white'. I'm setting it to 'green' to show you what changed after we added this:
+```{r}
+ggplot(plotDf, aes(x = var, y = value, fill = var)) + 
+  geom_col() +
+  labs(x = 'family type', title = "Family types under poverty level") +
+  scale_fill_manual(values = c('#9e2a2b','#e09f3e','#0a9396')) +
+  theme(panel.background = element_rect(fill = 'green'))
+```
+
+
+# How to have plots show up on the right in the "Plots" panel:
+
+This is a settings issue, not a code issue. See: https://posit.co/blog/r-markdown-tips-tricks-1-rstudio-ide/#:~:text=Show%20plots%20in%20the%20Viewer,Voil%C3%A0!
+
+By default, code chunks display R Markdown plots “inline”, or directly underneath the code chunk. If you would rather see the plot in the Viewer pane, go to RStudio > Preferences > R Markdown and unselect “Show output inline for all R Markdown documents”.
+
+Alternatively, just copy all the code (everything in between ``` and ```{r}) into a r script and run it. The plot will show up on the right.
